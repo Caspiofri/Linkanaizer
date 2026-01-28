@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f3f7; /* Light Lavender */
+  --foreground: #171717;
+  --primary: #7A3E93; /* Deep Purple */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --font-sans: 'Inter', 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

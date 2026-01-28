@@ -1,0 +1,17 @@
+{
+  "name": "LinkClassify",
+  "short_name": "LinkClassify",
+  "description": "AI-Powered Link Classification and Organization",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f3f7",
+  "theme_color": "#7A3E93",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
