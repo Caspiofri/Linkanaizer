@@ -15,9 +15,16 @@ import { Link } from '@/src/types';
 interface InsertLinkModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialUrl?: string;
+  autoStartOnOpen?: boolean;
 }
 
-export default function InsertLinkModal({ isOpen, onClose }: InsertLinkModalProps) {
+export default function InsertLinkModal({
+  isOpen,
+  onClose,
+  initialUrl,
+  autoStartOnOpen = false,
+}: InsertLinkModalProps) {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,12 +37,24 @@ export default function InsertLinkModal({ isOpen, onClose }: InsertLinkModalProp
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
-      setUrl('');
+      setUrl(initialUrl || '');
       setError(null);
       setClassification(null);
       setIsLoading(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialUrl]);
+
+  // If opened from a Web Share Target with an initial URL, auto-start classification once
+  useEffect(() => {
+    if (isOpen && autoStartOnOpen && initialUrl && !isLoading && !classification) {
+      setUrl(initialUrl);
+      // Slight delay to ensure state is set before triggering
+      const id = setTimeout(() => {
+        void handleImport();
+      }, 50);
+      return () => clearTimeout(id);
+    }
+  }, [isOpen, autoStartOnOpen, initialUrl, isLoading, classification]);
 
   // Reset state when modal closes
   const handleClose = () => {
@@ -110,6 +129,11 @@ export default function InsertLinkModal({ isOpen, onClose }: InsertLinkModalProp
         }
       }}
     >
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <Loader2 className="w-10 h-10 text-[#7A3E93] animate-spin" />
+        </div>
+      )}
       <div 
         className="bg-white rounded-[32px] shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}

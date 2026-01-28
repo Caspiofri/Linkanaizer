@@ -4,19 +4,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Plus, Upload, Link as LinkIcon } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  // Only render after client-side hydration to avoid hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const navItems = [
     {
@@ -35,11 +28,6 @@ export default function BottomNav() {
       label: 'Insert Link',
     },
   ];
-
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">

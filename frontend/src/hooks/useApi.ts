@@ -4,7 +4,8 @@
 
 import { LinkClassification, LinkClassificationRequest, Category } from '@/src/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Prefer explicit 127.0.0.1 to avoid localhost DNS quirks on Windows
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 const API_V1 = `${API_BASE_URL}/api/v1`;
 
 export interface ApiError {
@@ -17,7 +18,11 @@ export async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_V1}${endpoint}`;
-  
+  console.log('API request:', {
+    url,
+    method: options.method || 'GET',
+  });
+
   const response = await fetch(url, {
     ...options,
     headers: {
