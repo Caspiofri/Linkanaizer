@@ -24,7 +24,9 @@ export default function CategoryCard({ category }: CategoryCardProps) {
           ) : null}
           <h3 className="text-[#7A3E93] font-semibold text-lg">{category.name}</h3>
         </div>
-        <span className="text-gray-500 text-sm">{category.count}</span>
+        <span className="text-gray-500 text-sm">
+          {category.count} Links
+        </span>
       </div>
     </Link>
   );

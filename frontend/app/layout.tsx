@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body 
-        className={`${inter.variable} ${montserrat.variable} font-sans`}
+        className={`${inter.variable} ${montserrat.variable} font-sans bg-[#F5F3F7] min-h-screen`}
         suppressHydrationWarning
       >
         {children}

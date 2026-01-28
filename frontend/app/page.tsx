@@ -4,40 +4,54 @@
 
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useLinkStore } from '@/src/store/useLinkStore';
 import CategoryCard from '@/src/components/CategoryCard';
 import InsertLinkModal from '@/src/components/modals/InsertLinkModal';
 
 export default function HomePage() {
-  const router = useRouter();
-  const { getCategoriesWithEmojis, isInsertLinkModalOpen, openInsertLinkModal, closeInsertLinkModal } = useLinkStore();
+  const {
+    getCategoriesWithEmojis,
+    isInsertLinkModalOpen,
+    openInsertLinkModal,
+    closeInsertLinkModal,
+  } = useLinkStore();
 
-  // Only show user-entered categories, enriched with emojis from links
-  const displayCategories = getCategoriesWithEmojis();
+  const displayCategories = getCategoriesWithEmojis().filter((c) => c.is_visible);
 
   return (
-    <div className="min-h-screen bg-[#f5f3f7] pb-20">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-        <h1 className="text-[#7A3E93] font-bold text-2xl">LinkClassify</h1>
-        <button
-          onClick={() => router.push('/category/new')}
-          className="px-4 py-2 bg-[#7A3E93] text-white rounded-[32px] hover:bg-[#6a3580] transition-colors text-sm font-medium"
-        >
-          New Category
-        </button>
+    <div className="min-h-screen bg-[#F5F3F7] pb-28">
+      {/* Top welcome section */}
+      <div className="px-6 pt-6">
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1 min-w-0">
+            <p className="text-gray-700 text-2xl leading-tight">Hello,</p>
+            <p className="text-gray-700 text-2xl leading-tight">
+              <span className="font-bold text-[#7A3E93]">Shir A.</span> 👋
+            </p>
+            <p className="mt-2 text-gray-500 text-sm">Your Top Categories:</p>
+          </div>
+
+          <div className="relative w-[140px] h-[140px] shrink-0">
+            <Image
+              src="/assets/images/ill-welcome.svg"
+              alt="Welcome illustration"
+              fill
+              priority
+              className="object-contain"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Categories Grid */}
-      <div className="p-4 space-y-4">
+      <div className="px-6 mt-6 space-y-4">
         {displayCategories.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-10">
             <p className="text-gray-500 mb-4">No categories yet.</p>
             <button
               onClick={() => openInsertLinkModal()}
-              className="px-6 py-3 bg-[#7A3E93] text-white rounded-[32px] hover:bg-[#6a3580] transition-colors"
+              className="px-6 py-3 bg-gradient-to-br from-[#7A3E93] to-[#AC5FCF] text-white rounded-[24px] hover:opacity-95 transition-opacity shadow-sm"
             >
               Add Your First Link
             </button>

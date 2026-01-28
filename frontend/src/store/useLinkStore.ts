@@ -8,6 +8,7 @@ import { Link, Category } from '@/src/types';
 interface LinkStore {
   links: Link[];
   categories: Category[];
+  userFullName: string;
   isLoading: boolean;
   error: string | null;
   isInsertLinkModalOpen: boolean;
@@ -18,6 +19,7 @@ interface LinkStore {
   addCategory: (category: Category) => void;
   removeCategory: (id: string) => void;
   toggleCategoryVisibility: (id: string) => void;
+  setUserFullName: (fullName: string) => void;
   setLinks: (links: Link[]) => void;
   setCategories: (categories: Category[]) => void;
   setLoading: (loading: boolean) => void;
@@ -34,6 +36,7 @@ interface LinkStore {
 export const useLinkStore = create<LinkStore>((set, get) => ({
   links: [],
   categories: [],
+  userFullName: 'Jane Doe',
   isLoading: false,
   error: null,
   isInsertLinkModalOpen: false,
@@ -80,6 +83,7 @@ export const useLinkStore = create<LinkStore>((set, get) => ({
       ),
     })),
 
+  setUserFullName: (userFullName) => set({ userFullName }),
   setLinks: (links) => set({ links }),
   setCategories: (categories) => set({ categories }),
   setLoading: (isLoading) => set({ isLoading }),
@@ -121,14 +125,6 @@ function updateCategoryCount(
         : c
     );
   }
-  
-  if (delta > 0) {
-    return [...categories, { 
-      id: categoryName.toLowerCase().replace(/\s+/g, '-'), 
-      name: categoryName, 
-      count: 1 
-    }];
-  }
-  
+
   return categories;
 }
