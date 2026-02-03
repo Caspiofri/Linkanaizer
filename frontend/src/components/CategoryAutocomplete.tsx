@@ -70,7 +70,8 @@ export default function CategoryAutocomplete({
         id: String(created.id),
         name: created.name,
         emoji: created.emoji,
-        count: 0,
+        is_visible: created.is_visible,
+        count: created.link_count ?? 0,
       };
       addCategory(newCategory);
       setQuery(newCategory.name);
