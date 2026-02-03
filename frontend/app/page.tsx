@@ -5,9 +5,9 @@
 'use client';
 
 import Image from 'next/image';
-import { useLinkStore } from '@/src/store/useLinkStore';
-import CategoryCard from '@/src/components/CategoryCard';
-import InsertLinkModal from '@/src/components/modals/InsertLinkModal';
+import { useLinkStore } from '../src/store/useLinkStore';
+import CategoryCard from '../src/components/CategoryCard';
+import InsertLinkModal from '../src/components/modals/InsertLinkModal';
 
 export default function HomePage() {
   const {

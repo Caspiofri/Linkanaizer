@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
-import BottomNav from "@/src/components/BottomNav";
 import ServiceWorkerRegistrar from "@/src/components/ServiceWorkerRegistrar";
+import AuthProvider from "@/src/components/AuthProvider";
+import BottomNavGate from "@/src/components/BottomNavGate";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,7 +28,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
   themeColor: "#7c3aed",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -42,8 +47,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ServiceWorkerRegistrar />
-        {children}
-        <BottomNav />
+        <AuthProvider>{children}</AuthProvider>
+        <BottomNavGate />
       </body>
     </html>
   );

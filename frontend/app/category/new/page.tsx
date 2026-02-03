@@ -7,9 +7,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, X, Plus, Search, Check } from 'lucide-react';
-import { useLinkStore } from '@/src/store/useLinkStore';
-import { Category } from '@/src/types';
-import { useApi } from '@/src/hooks/useApi';
+import { useLinkStore } from '../../../src/store/useLinkStore';
+import { Category } from '../../../src/types';
+import { useApi } from '../../../src/hooks/useApi';
 
 export default function NewCategoryPage() {
   const router = useRouter();
@@ -116,10 +116,12 @@ export default function NewCategoryPage() {
       <div className="sticky top-0 bg-white z-10 border-b border-gray-200">
         <div className="flex items-center gap-4 p-4">
           <button
+            type="button"
             onClick={() => router.back()}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 -m-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-500 hover:text-gray-700 touch-manipulation"
+            aria-label="Go back"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-6 h-6" aria-hidden />
           </button>
           <h1 className="text-[#7A3E93] font-bold text-2xl flex-1">New Category</h1>
         </div>
@@ -142,19 +144,22 @@ export default function NewCategoryPage() {
         <div className="relative">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
-            type="text"
+            type="search"
             suppressHydrationWarning
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search categories..."
-            className="w-full pl-12 pr-10 py-3 bg-white border border-gray-300 rounded-[32px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93]"
+            className="w-full pl-12 pr-10 py-3 min-h-[48px] bg-white border border-gray-300 rounded-[32px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93] touch-manipulation text-base"
+            aria-label="Search categories"
           />
           {searchQuery && (
             <button
+              type="button"
               onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 touch-manipulation"
+              aria-label="Clear search"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden />
             </button>
           )}
         </div>

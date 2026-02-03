@@ -7,10 +7,10 @@
 import { useState, useEffect } from 'react';
 import { X, Loader2, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
-import { useApi } from '@/src/hooks/useApi';
-import { useLinkStore } from '@/src/store/useLinkStore';
+import { useApi } from '../../hooks/useApi';
+import { useLinkStore } from '../../store/useLinkStore';
 import { useRouter } from 'next/navigation';
-import { Link } from '@/src/types';
+import { Link } from '../../types';
 
 interface InsertLinkModalProps {
   isOpen: boolean;
@@ -81,17 +81,21 @@ export default function InsertLinkModal({
       const categoryNames =
         visibleCategoryNames.length > 0 ? visibleCategoryNames : undefined;
 
-      console.log('Classifying URL:', url.trim());
-      console.log('Categories to send:', categoryNames);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Classifying URL:', url.trim());
+        console.log('Categories to send:', categoryNames);
+      }
       const result = await classifyLink(url.trim(), categoryNames);
 
-      // Detailed logging of LLM classification result
-      console.log('LLM classification raw result:', result);
-      console.log('LLM classification - category:', result.category);
-      console.log('LLM classification - title:', result.title);
-      console.log('LLM classification - summary:', result.summary);
-      console.log('LLM classification - category_emoji:', result.category_emoji);
-      console.log('LLM classification - keywords:', result.keywords);
+      // Detailed logging of LLM classification result (development only)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('LLM classification raw result:', result);
+        console.log('LLM classification - category:', result.category);
+        console.log('LLM classification - title:', result.title);
+        console.log('LLM classification - summary:', result.summary);
+        console.log('LLM classification - category_emoji:', result.category_emoji);
+        console.log('LLM classification - keywords:', result.keywords);
+      }
       
       // Create a link object with generated ID
       const newLink: Link = {

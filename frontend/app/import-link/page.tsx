@@ -6,8 +6,8 @@
 
 import { useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useLinkStore } from '@/src/store/useLinkStore';
-import InsertLinkModal from '@/src/components/modals/InsertLinkModal';
+import { useLinkStore } from '../../src/store/useLinkStore';
+import InsertLinkModal from '../../src/components/modals/InsertLinkModal';
 
 export default function ImportLinkPage() {
   const router = useRouter();

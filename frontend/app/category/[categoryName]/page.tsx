@@ -7,8 +7,8 @@
 import { useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Search } from 'lucide-react';
-import { useLinkStore } from '@/src/store/useLinkStore';
-import LinkItem from '@/src/components/LinkItem';
+import { useLinkStore } from '../../../src/store/useLinkStore';
+import LinkItem from '../../../src/components/LinkItem';
 
 export default function CategoryPage() {
   const params = useParams();
@@ -71,11 +71,12 @@ export default function CategoryPage() {
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
-              type="text"
+              type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title or summary..."
-              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-300 rounded-[32px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93]"
+              className="w-full pl-12 pr-4 py-3 min-h-[48px] bg-white border border-gray-300 rounded-[32px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93] touch-manipulation text-base"
+              aria-label="Search links by title or summary"
             />
           </div>
         </div>

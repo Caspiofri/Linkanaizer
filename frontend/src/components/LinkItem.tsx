@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Link } from '@/src/types';
+import { Link } from '../types';
 import { ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 

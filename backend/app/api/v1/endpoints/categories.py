@@ -2,18 +2,21 @@
 API endpoints for category management.
 
 IMPORTANT:
-- To keep things responsive for you right now, categories are stored in memory,
+- To keep things responsive for now, categories are stored in memory,
   not in the SQLite DB (no DB round-trips, no connection resets).
 - We still normalize names, avoid duplicates case-insensitively, generate emoji,
-  and support is_visible + toggle-visibility, so הזרימה ב-UI נשארת זהה.
+  and support is_visible + toggle-visibility, so the UI behavior stays the same.
 """
 
 from typing import List
+import logging
 
 from fastapi import APIRouter, HTTPException
 
 from app.schemas import CategoryCreate, CategoryRead
 from app.services.llm_service import llm_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -27,7 +30,7 @@ async def list_categories() -> List[CategoryRead]:
   """
   List all categories with emoji, visibility and link_count.
   """
-  print("DEBUG: list_categories called (in-memory)")
+  logger.debug("Listing categories from in-memory store")
   return _CATEGORIES
 
 
@@ -62,7 +65,7 @@ async def create_category(category_in: CategoryCreate) -> CategoryRead:
   try:
     emoji = await llm_service.generate_category_emoji(canonical_name)
   except Exception as e:
-    print(f"WARNING: failed to generate emoji for category {canonical_name!r}: {e}")
+    logger.warning("Failed to generate emoji for category %r: %s", canonical_name, e)
     emoji = None
 
   category = CategoryRead(
@@ -75,7 +78,12 @@ async def create_category(category_in: CategoryCreate) -> CategoryRead:
   _NEXT_ID += 1
   _CATEGORIES.append(category)
 
-  print(f"DEBUG: created in-memory category id={category.id}, name={category.name}, emoji={category.emoji!r}")
+  logger.debug(
+    "Created in-memory category id=%s, name=%s, emoji=%r",
+    category.id,
+    category.name,
+    category.emoji,
+  )
   return category
 
 
@@ -94,8 +102,10 @@ async def toggle_category_visibility(category_id: int) -> CategoryRead:
         link_count=c.link_count,
       )
       _CATEGORIES[idx] = updated
-      print(
-        f"DEBUG: toggled visibility for category id={updated.id}, now is_visible={updated.is_visible}"
+      logger.debug(
+        "Toggled visibility for category id=%s, now is_visible=%s",
+        updated.id,
+        updated.is_visible,
       )
       return updated
 

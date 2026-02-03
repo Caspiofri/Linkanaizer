@@ -4,8 +4,8 @@
 
 'use client';
 
-import { useLinkStore } from '@/src/store/useLinkStore';
-import LinkItem from '@/src/components/LinkItem';
+import { useLinkStore } from '../../src/store/useLinkStore';
+import LinkItem from '../../src/components/LinkItem';
 
 export default function LinksPage() {
   const { links } = useLinkStore();

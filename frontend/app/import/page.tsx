@@ -5,7 +5,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ImportFileModal from '@/src/components/modals/ImportFileModal';
+import ImportFileModal from '../../src/components/modals/ImportFileModal';
 
 export default function ImportPage() {
   const [isModalOpen, setIsModalOpen] = useState(true);

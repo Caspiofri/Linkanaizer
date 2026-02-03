@@ -1,7 +1,9 @@
 """
 Main FastAPI application entry point.
 """
+import logging
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -11,23 +13,24 @@ from app.db.database import engine
 from app.db.base import Base
 
 
+logger = logging.getLogger(__name__)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
     Lifespan context manager for application startup and shutdown.
     Handles database connection cleanup.
     """
-    print("DEBUG: Lifespan started, yielding now...")
+    logger.debug("Application lifespan started")
     yield  # Application runs here
     
     # Shutdown: Cleanup database connections
     try:
         await engine.dispose()
-        print("✓ Database connection closed")
-    except Exception as e:
-        print(f"✗ ERROR: Failed to close database connection: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.info("Database connection closed")
+    except Exception:
+        logger.exception("Failed to close database connection during shutdown")
 
 
 def create_application() -> FastAPI:

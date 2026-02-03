@@ -18,3 +18,10 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* Improve tap targets and avoid double-tap zoom on mobile */
+@media (pointer: coarse) {
+  button, a, input, [role="button"] {
+    touch-action: manipulation;
+  }
+}

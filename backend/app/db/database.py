@@ -1,15 +1,19 @@
 """
 Database connection and session management.
 """
+import logging
+
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
+
 # Get database URL
 database_url = str(settings.DATABASE_URL)
-print(f"Initializing database with URL: {database_url}")
+logger.info("Initializing database connection")
 
 # Determine if we're using SQLite
 is_sqlite = database_url and "sqlite" in database_url.lower()
@@ -24,7 +28,7 @@ engine_kwargs = {
 if is_sqlite:
     # SQLite with aiosqlite works better with NullPool for async operations
     engine_kwargs["poolclass"] = NullPool
-    print("Using SQLite with aiosqlite driver")
+    logger.info("Using SQLite with aiosqlite driver")
 
 # Create async engine
 try:
@@ -32,9 +36,9 @@ try:
         database_url,
         **engine_kwargs,
     )
-    print("Database engine created successfully")
-except Exception as e:
-    print(f"ERROR: Failed to create database engine: {e}")
+    logger.info("Database engine created successfully")
+except Exception:
+    logger.exception("Failed to create database engine")
     raise
 
 # Create async session factory

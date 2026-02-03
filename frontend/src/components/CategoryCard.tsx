@@ -4,7 +4,7 @@
 
 'use client';
 
-import { Category } from '@/src/types';
+import { Category } from '../types';
 import Link from 'next/link';
 
 interface CategoryCardProps {

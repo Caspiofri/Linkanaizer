@@ -8,9 +8,9 @@
 
 import { useState, useMemo } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { Category } from '@/src/types';
-import { useApi } from '@/src/hooks/useApi';
-import { useLinkStore } from '@/src/store/useLinkStore';
+import { Category } from '../types';
+import { useApi } from '../hooks/useApi';
+import { useLinkStore } from '../store/useLinkStore';
 
 interface CategoryAutocompleteProps {
   selectedCategory: Category | null;
@@ -97,7 +97,8 @@ export default function CategoryAutocomplete({
             }
           }}
           placeholder="Search or create category..."
-          className="w-full pl-9 pr-10 py-2 border border-gray-300 rounded-[24px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93] text-sm"
+          className="w-full pl-9 pr-10 py-2 min-h-[44px] border border-gray-300 rounded-[24px] focus:outline-none focus:ring-2 focus:ring-[#7A3E93] text-sm touch-manipulation"
+          aria-label="Search or create category"
         />
         {query && (
           <button

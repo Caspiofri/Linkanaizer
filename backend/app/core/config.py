@@ -114,6 +114,20 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
 
+    # Frontend Auth (NextAuth / Google)
+    GOOGLE_CLIENT_ID: str = Field(
+        default="",
+        description="Google OAuth client ID (used to validate id_token aud)",
+    )
+    GOOGLE_CLIENT_SECRET: str = Field(
+        default="",
+        description="Google OAuth client secret (not required for token verification)",
+    )
+    NEXTAUTH_SECRET: str = Field(
+        default="",
+        description="NextAuth secret (optional, if you later verify NextAuth JWTs server-side)",
+    )
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

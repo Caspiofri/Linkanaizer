@@ -544,12 +544,15 @@ Rules:
                     params=params,
                 )
                 response.raise_for_status()
-                
-                # Debug: Print raw response for troubleshooting
-                print(f"DEBUG: Response from Gemini - Status: {response.status_code}")
-                print(f"DEBUG: Response from Gemini - Headers: {dict(response.headers)}")
-                print(f"DEBUG: Response from Gemini - Text: {response.text[:1000]}")
-                
+
+                # Debug logging for troubleshooting (kept in logs, not stdout)
+                logger.debug(
+                    "Response from Gemini - Status: %s, Headers: %s, Text preview: %s",
+                    response.status_code,
+                    dict(response.headers),
+                    response.text[:1000],
+                )
+
                 result = response.json()
                 
                 # Extract JSON from response

@@ -3,7 +3,7 @@
  */
 
 import { create } from 'zustand';
-import { Link, Category } from '@/src/types';
+import { Link, Category } from '../types';
 
 interface LinkStore {
   links: Link[];
