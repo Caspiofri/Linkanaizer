@@ -1,95 +1,50 @@
 # LinkClassify
 
-A scalable FastAPI application for link classification using PostgreSQL, SQLAlchemy, Scraping API, and LLM providers.
+A full-stack application for classifying and analyzing web links using AI.
 
 ## Project Structure
 
 ```
-app/
-├── __init__.py
-├── main.py                 # FastAPI application entry point
-├── api/                    # API routes
-│   ├── __init__.py
-│   └── v1/
-│       ├── __init__.py
-│       ├── router.py       # Main API router
-│       └── endpoints/      # Individual endpoint modules
-│           └── __init__.py
-├── core/                   # Core configuration
-│   ├── __init__.py
-│   ├── config.py          # Settings and environment variables
-│   └── security.py        # Authentication/authorization utilities
-├── db/                     # Database configuration
-│   ├── __init__.py
-│   ├── base.py            # SQLAlchemy base
-│   ├── database.py        # Database connection and sessions
-│   └── models/            # Database models
-│       └── __init__.py
-├── schemas/                # Pydantic schemas
-│   └── __init__.py
-├── services/               # Business logic services
-│   ├── __init__.py
-│   ├── scraping_service.py # Scraping API integration
-│   └── llm_service.py     # LLM provider integration
-└── utils/                  # Utility functions
-    ├── __init__.py
-    └── logging.py         # Logging configuration
+linkclassify/
+├── backend/          # FastAPI backend application
+│   ├── app/         # FastAPI application code
+│   ├── alembic/     # Database migrations
+│   ├── .env         # Backend environment variables
+│   └── requirements.txt
+└── frontend/        # Next.js frontend application
+    ├── public/
+    │   └── assets/
+    │       └── images/  # Place your Figma SVGs here
+    └── ...
 ```
 
-## Setup
+## Quick Start
 
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Backend Setup
 
-2. **Set up environment variables:**
-   ```bash
-   cp .env.example .env
-   ```
-   Then edit `.env` with your actual values.
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-3. **Run database migrations (when using Alembic):**
-   ```bash
-   alembic upgrade head
-   ```
+Backend runs on: `http://localhost:8000`
+API Docs: `http://localhost:8000/docs`
 
-4. **Start the server:**
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+### Frontend Setup
 
-## Environment Variables
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-All environment variables are configured in `.env` and loaded via `pydantic-settings`. See `.env.example` for all available options.
+Frontend runs on: `http://localhost:3000`
 
-### Required Variables:
-- `SCRAPING_API_KEY`: Your scraping API key
-- `LLM_API_KEY`: Your LLM provider API key
-- `SECRET_KEY`: Secret key for JWT tokens (minimum 32 characters)
-- `POSTGRES_*`: Database connection details
+## Assets (Figma SVGs)
 
-### Optional Variables:
-- `LLM_PROVIDER`: LLM provider name (default: "openai")
-- `LLM_MODEL`: Model name (default: "gpt-4")
-- `SCRAPING_API_URL`: Custom scraping API URL
-- `LLM_API_URL`: Custom LLM API URL (if different from default)
+Place your exported Figma SVGs in: **`frontend/public/assets/images/`**
 
-## Features
+## Detailed Instructions
 
-- ✅ Scalable folder structure
-- ✅ Async PostgreSQL with SQLAlchemy
-- ✅ Environment variable management with Pydantic
-- ✅ Scraping API service integration
-- ✅ LLM provider service integration (OpenAI, Anthropic, Groq)
-- ✅ Security utilities (JWT, password hashing)
-- ✅ CORS configuration
-- ✅ Structured logging
-
-## Development
-
-The project uses:
-- **FastAPI** for the web framework
-- **SQLAlchemy 2.0** with async support
-- **Pydantic Settings** for configuration management
-- **Alembic** for database migrations (setup needed)
+See [SETUP_INSTRUCTIONS.md](./SETUP_INSTRUCTIONS.md) for comprehensive setup and usage instructions.

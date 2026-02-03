@@ -1,0 +1,69 @@
+"""
+Pydantic schemas for link classification.
+"""
+from typing import List
+from pydantic import BaseModel, Field
+
+
+class LinkClassification(BaseModel):
+    """
+    Schema for link classification results.
+    """
+    category: str = Field(
+        ...,
+        description="The category/type of the link (e.g., 'article', 'product', 'video', 'document')",
+        min_length=1,
+        max_length=100,
+    )
+    category_emoji: str = Field(
+        ...,
+        description="A single relevant emoji that represents the category (e.g., '💪' for fitness, '📱' for product, '🎥' for video, '📄' for document)",
+        min_length=1,
+        max_length=10,
+    )
+    title: str = Field(
+        ...,
+        description="A short, concise title (up to 3 lines) that describes the content in a minimal and viewer-friendly way",
+        min_length=5,
+        max_length=200,
+    )
+    summary: str = Field(
+        ...,
+        description="A focused, direct description of the content. Be concise and avoid introductory phrases like 'This Instagram reel from...' or 'This video shows...'. Start directly with the main content description.",
+        min_length=10,
+        max_length=500,
+    )
+    keywords: List[str] = Field(
+        ...,
+        description="List of relevant keywords extracted from the content",
+        min_items=1,
+        max_items=20,
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "category": "video",
+                "category_emoji": "💪",
+                "title": "Calisthenics Workout Routine",
+                "summary": "Advanced bodyweight exercises focusing on pull-ups, dips, and muscle-ups. Demonstrates proper form and progression techniques.",
+                "keywords": ["calisthenics", "workout", "bodyweight", "fitness", "exercise"],
+            }
+        }
+
+
+class LinkClassificationRequest(BaseModel):
+    """Request schema for link classification."""
+    url: str = Field(..., description="The URL to classify")
+    categories: List[str] = Field(
+        default=None,
+        description="Optional list of allowed categories. If not provided, the LLM will choose freely.",
+    )
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "url": "https://example.com/article",
+                "categories": ["article", "product", "video", "document"],
+            }
+        }

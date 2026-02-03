@@ -1,0 +1,52 @@
+# Production-style docker-compose for LinkClassify
+# Usage: docker compose -f docker-compose.prod.yml up -d
+# Set env in .env or export BACKEND_CORS_ORIGINS, DATABASE_URL, etc.
+# For local Postgres: docker compose -f docker-compose.prod.yml --profile with-db up -d
+# Then set DATABASE_URL=postgresql+asyncpg://postgres:POSTGRES_PASSWORD@localhost:5432/linkclassify (or db:5432 from backend container).
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SCRAPING_API_KEY=${SCRAPING_API_KEY}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_MODEL=${LLM_MODEL:-gpt-4}
+      - SECRET_KEY=${SECRET_KEY}
+      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS:-http://localhost:3000}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    env_file:
+      - ./backend/.env
+    restart: unless-stopped
+    # If using a separate Postgres service (e.g. on Railway/Render), remove the db service and set DATABASE_URL to the external DB
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+  # Optional: local Postgres for full stack in one compose (e.g. dev/staging)
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-linkclassify}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-linkclassify}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    profiles:
+      - with-db
+
+volumes:
+  postgres_data:

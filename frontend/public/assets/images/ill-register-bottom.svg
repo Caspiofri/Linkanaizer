@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <rect width="500" height="500" fill="#F5F3F7"/>
+  <rect x="130" y="120" width="240" height="280" rx="40" fill="#7A3E93" opacity="0.12"/>
+  <rect x="170" y="170" width="160" height="36" rx="18" fill="#7A3E93" opacity="0.25"/>
+  <rect x="170" y="225" width="160" height="36" rx="18" fill="#7A3E93" opacity="0.22"/>
+  <rect x="170" y="280" width="160" height="36" rx="18" fill="#7A3E93" opacity="0.18"/>
+  <circle cx="120" cy="320" r="50" fill="#AC5FCF" opacity="0.18"/>
+  <text x="250" y="450" text-anchor="middle" fill="#7A3E93" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" opacity="0.7">
+    Illustration placeholder
+  </text>
+</svg>
+

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert SVG to PNG Icons</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f3f7;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    button {
+      background: #7c3aed;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #6a3580;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 20px 0;
+      display: block;
+    }
+    .instructions {
+      background: #f0f0f0;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Convert SVG to PWA Icons</h1>
+    
+    <div class="instructions">
+      <strong>Instructions:</strong>
+      <ol>
+        <li>Click "Load SVG" to load the logo</li>
+        <li>Click "Generate 192x192" to create icon-192.png</li>
+        <li>Click "Generate 512x512" to create icon-512.png</li>
+        <li>Right-click each canvas and "Save image as..." to save the PNG files</li>
+        <li>Save them in the <code>frontend/public/icons/</code> directory</li>
+      </ol>
+    </div>
+
+    <div>
+      <button onclick="loadSVG()">Load SVG</button>
+      <button onclick="generate192()">Generate 192x192</button>
+      <button onclick="generate512()">Generate 512x512</button>
+    </div>
+
+    <canvas id="canvas192" width="192" height="192" style="display: none;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="display: none;"></canvas>
+
+    <div id="preview"></div>
+  </div>
+
+  <script>
+    let svgImage = null;
+
+    function loadSVG() {
+      const img = new Image();
+      img.onload = function() {
+        svgImage = img;
+        alert('SVG loaded! Now click the generate buttons.');
+      };
+      img.onerror = function() {
+        alert('Error loading SVG. Make sure logo.svg exists in the parent directory.');
+      };
+      // Try to load from parent directory
+      img.src = '../logo.svg';
+    }
+
+    function drawToCanvas(canvas, size) {
+      if (!svgImage) {
+        alert('Please load SVG first!');
+        return;
+      }
+      
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, size, size);
+      
+      // Draw SVG to canvas
+      ctx.drawImage(svgImage, 0, 0, size, size);
+      
+      // Show canvas
+      canvas.style.display = 'block';
+      canvas.style.margin = '20px auto';
+      
+      // Create download link
+      canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `icon-${size}.png`;
+        a.textContent = `Download icon-${size}.png`;
+        a.style.display = 'block';
+        a.style.marginTop = '10px';
+        a.style.color = '#7c3aed';
+        a.style.textDecoration = 'underline';
+        
+        const existing = document.getElementById(`link-${size}`);
+        if (existing) existing.remove();
+        
+        a.id = `link-${size}`;
+        canvas.parentNode.appendChild(a);
+      });
+    }
+
+    function generate192() {
+      drawToCanvas(document.getElementById('canvas192'), 192);
+    }
+
+    function generate512() {
+      drawToCanvas(document.getElementById('canvas512'), 512);
+    }
+  </script>
+</body>
+</html>
