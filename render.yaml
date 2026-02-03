@@ -24,6 +24,21 @@ services:
     # Health check optional
     # healthCheckPath: /api/v1/health
 
+  - type: web
+    name: linkclassify-frontend
+    runtime: node
+    rootDir: ./frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: linkclassify-backend
+          type: web
+          property: host
+        # Override with full URL: https://linkclassify-backend.onrender.com
+        # Render will set this automatically if using fromService, but you may need to set manually
+
 databases:
   - name: linkclassify-db
     plan: free

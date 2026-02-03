@@ -74,14 +74,23 @@ Ensure `backend/.env` (or env vars) includes `DATABASE_URL`, `SCRAPING_API_KEY`,
 
 ---
 
-## 4. Frontend (Next.js) – Vercel / static export
+## 4. Frontend (Next.js) – Render / Vercel
 
-### Vercel (recommended for Next.js)
+### Render (recommended for full-stack deployment)
 
 1. Import Git repo → set **Root Directory** to `frontend`.
 2. **Build command:** `npm run build` (or `pnpm build` / `yarn build`).
 3. **Output:** Next.js default (no extra config unless you use static export).
-4. **Environment variables:** e.g. `NEXT_PUBLIC_API_URL=https://your-backend.railway.app` (or Render URL) so the frontend calls the correct API.
+4. **Environment variables (REQUIRED):**
+   - Go to **Project Settings** → **Environment Variables** in Vercel
+   - Add `NEXT_PUBLIC_API_URL` with your backend URL:
+     - **Production:** `https://your-backend.railway.app` (or Render/other backend URL)
+     - **Preview:** Same as production or your staging backend URL
+     - **Development:** `http://127.0.0.1:8000` (for local dev)
+   - **Important:** Set this for **all environments** (Production, Preview, Development)
+   - Example: `NEXT_PUBLIC_API_URL=https://linkclassify-backend.railway.app`
+   
+   **Note:** The frontend uses absolute URLs from `NEXT_PUBLIC_API_URL` for all API calls. The `next.config.ts` rewrites are optional and allow using relative URLs (`/api/v1/...`) as an alternative.
 5. Deploy; then add the Vercel URL to the backend’s `BACKEND_CORS_ORIGINS`.
 
 ### Build script (local / CI)
