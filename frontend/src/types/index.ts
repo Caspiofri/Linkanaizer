@@ -22,6 +22,20 @@ export interface Link extends LinkClassification {
   updatedAt: string;
 }
 
+/**
+ * Category as returned from backend API (matches CategoryRead schema)
+ */
+export interface CategoryApiResponse {
+  id: number;
+  name: string;
+  emoji?: string;
+  is_visible: boolean;
+  link_count: number;
+}
+
+/**
+ * Category as used in frontend store/components
+ */
 export interface Category {
   id: string;
   name: string;

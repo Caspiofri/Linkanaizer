@@ -28,7 +28,7 @@ export default function NewCategoryPage() {
         setIsLoading(true);
         setError(null);
         const backendCategories = await fetchCategories();
-        // Map backend categories (which don't have counts) into frontend Category shape
+        // Map backend API response (link_count) to frontend Category shape (count)
         const mapped: Category[] = backendCategories.map((c) => ({
           id: String(c.id),
           name: c.name,
@@ -85,7 +85,7 @@ export default function NewCategoryPage() {
         name: created.name,
         emoji: created.emoji,
         is_visible: created.is_visible,
-        count: 0,
+        count: created.link_count ?? 0,
       };
       addCategory(newCategory);
       setSearchQuery('');

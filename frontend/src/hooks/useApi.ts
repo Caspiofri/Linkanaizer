@@ -2,7 +2,7 @@
  * Centralized API hook for backend communication
  */
 
-import { LinkClassification, LinkClassificationRequest, Category } from '../types';
+import { LinkClassification, LinkClassificationRequest, Category, CategoryApiResponse } from '../types';
 
 // Prefer explicit 127.0.0.1 to avoid localhost DNS quirks on Windows
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
@@ -62,30 +62,30 @@ export function useApi() {
     });
   };
 
-  const fetchCategories = async (): Promise<Category[]> => {
+  const fetchCategories = async (): Promise<CategoryApiResponse[]> => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('API: fetching categories...');
     }
-    return apiRequest<Category[]>('/categories', {
+    return apiRequest<CategoryApiResponse[]>('/categories', {
       method: 'GET',
     });
   };
 
-  const createCategory = async (name: string): Promise<Category> => {
+  const createCategory = async (name: string): Promise<CategoryApiResponse> => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('API: creating category with name:', name);
     }
-    return apiRequest<Category>('/categories', {
+    return apiRequest<CategoryApiResponse>('/categories', {
       method: 'POST',
       body: JSON.stringify({ name }),
     });
   };
 
-  const toggleCategoryVisibility = async (id: string): Promise<Category> => {
+  const toggleCategoryVisibility = async (id: string): Promise<CategoryApiResponse> => {
     if (process.env.NODE_ENV !== 'production') {
       console.log('API: toggling category visibility for id:', id);
     }
-    return apiRequest<Category>(`/categories/${id}/toggle-visibility`, {
+    return apiRequest<CategoryApiResponse>(`/categories/${id}/toggle-visibility`, {
       method: 'PATCH',
     });
   };

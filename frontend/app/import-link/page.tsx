@@ -4,12 +4,12 @@
 
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLinkStore } from '../../src/store/useLinkStore';
 import InsertLinkModal from '../../src/components/modals/InsertLinkModal';
 
-export default function ImportLinkPage() {
+function ImportLinkContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isInsertLinkModalOpen, openInsertLinkModal, closeInsertLinkModal } = useLinkStore();
@@ -48,6 +48,18 @@ export default function ImportLinkPage() {
         autoStartOnOpen={!!sharedUrl}
       />
     </div>
+  );
+}
+
+export default function ImportLinkPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f5f3f7] flex items-center justify-center">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    }>
+      <ImportLinkContent />
+    </Suspense>
   );
 }
 
