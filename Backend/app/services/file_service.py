@@ -4,6 +4,7 @@ import tempfile
 import requests
 from datetime import datetime
 from app.services.url_service import process_url
+from app.services.extract_service import _is_safe_url
 from app.core.firebase_config import DB, bucket
 from app.utils.url_utils import url_exists
 
@@ -41,6 +42,8 @@ def upload_to_firebase_storage(local_path, storage_path):
 
 
 async def import_from_file_url(file_url: str, uid: str) -> dict:
+    if not _is_safe_url(file_url):
+        raise ValueError("Blocked unsafe file URL")
     response = requests.get(file_url)
     response.raise_for_status()
 
