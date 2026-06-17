@@ -1,7 +1,8 @@
 import asyncio
 import time
 from app.core.firebase_config import DB
-from app.services.model_api import query_llama_summary, suggest_emoji_openrouter, _fallback_emoji
+from app.services.model_api import query_llama_summary, judge_classification, suggest_emoji_openrouter, _fallback_emoji
+from app.services.eval_service import log_llm_call
 from app.services.extract_service import extract_url
 from app.services.category_service import update_category_count , update_mapping
 from fastapi import HTTPException
@@ -68,12 +69,36 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
 
     cleaned_text = processing_content(raw_text)
 
+    judge = {"verdict": "UNKNOWN", "reasoning": "", "latency_ms": 0}
+
     try:
         category_name_to_id = get_all_categories_with_ids(uid)
         categories = list(category_name_to_id.keys())
         existing_tags = get_all_tags(uid)
 
+        t0 = time.time()
         llm_result = query_llama_summary(cleaned_text, categories, existing_tags)
+        classify_latency_ms = int((time.time() - t0) * 1000)
+
+        log_llm_call(uid, {
+            "type": "classify",
+            "model": "google/gemma-3-4b-it",
+            "url": url,
+            "latency_ms": classify_latency_ms,
+            "category": llm_result.get("category"),
+            "tags": llm_result.get("tags"),
+            "summary": llm_result.get("summary"),
+        })
+
+        judge = judge_classification(cleaned_text, llm_result)
+        log_llm_call(uid, {
+            "type": "judge",
+            "model": "google/gemma-3-4b-it",
+            "url": url,
+            "latency_ms": judge["latency_ms"],
+            "verdict": judge["verdict"],
+            "reasoning": judge["reasoning"],
+        })
 
         name = llm_result["short_name"]
         summary = llm_result["summary"]
@@ -129,7 +154,10 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
             'category_id': category_id,
             'thumbnail': url_metadata["thumbnail"],
             'tags': tags,
-            'timestamp': dt if dt else datetime.now()
+            'timestamp': dt if dt else datetime.now(),
+            'needs_review': judge["verdict"] == "NO",
+            'judge_verdict': judge["verdict"],
+            'judge_reasoning': judge["reasoning"],
         })
         url_id = doc_ref.id
         print("✅ URL saved to Firestore.")

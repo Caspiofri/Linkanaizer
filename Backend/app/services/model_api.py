@@ -206,6 +206,66 @@ def query_llama_summary(url_metadata_desc, categories, existing_tags=None):
         return {"summary": "API request failed", "categories": ["Error"]}
     
 
+def judge_classification(url_metadata_text: str, llm_result: dict) -> dict:
+    """Second LLM call that verifies the classification output. Returns verdict + reasoning."""
+    category = llm_result.get("category", "")
+    tags = llm_result.get("tags", [])
+    summary = llm_result.get("summary", "")
+    tags_str = ", ".join(tags) if tags else "none"
+
+    prompt = f"""You are a classification quality checker.
+
+A URL was analyzed and classified:
+- Category: "{category}"
+- Tags: {tags_str}
+- Summary: "{summary}"
+
+Source content:
+\"\"\"{url_metadata_text[:500]}\"\"\"
+
+Is this category accurate for this content?
+Reply with ONLY valid JSON, nothing else:
+{{"verdict": "YES", "reasoning": "<one sentence>"}} or {{"verdict": "NO", "reasoning": "<one sentence>"}}\
+"""
+
+    try:
+        t0 = time.time()
+        response = _post_with_retry(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json_data={
+                "model": "google/gemma-3-4b-it",
+                "messages": [{"role": "user", "content": prompt}],
+            },
+            timeout=15,
+            max_retries=1,
+            initial_delay=3,
+        )
+        latency_ms = int((time.time() - t0) * 1000)
+
+        if response.status_code != 200:
+            print(f"Judge API error ({response.status_code})")
+            return {"verdict": "UNKNOWN", "reasoning": "Judge call failed", "latency_ms": latency_ms}
+
+        content = response.json()["choices"][0]["message"]["content"]
+        print(f"Judge raw response: {content}")
+        parsed = extract_json(content)
+        verdict = parsed.get("verdict", "UNKNOWN").upper()
+        if verdict not in ("YES", "NO"):
+            verdict = "UNKNOWN"
+        return {
+            "verdict": verdict,
+            "reasoning": parsed.get("reasoning", ""),
+            "latency_ms": latency_ms,
+        }
+    except Exception as e:
+        print(f"Judge call failed: {e}")
+        return {"verdict": "UNKNOWN", "reasoning": str(e), "latency_ms": 0}
+
+
 # Enhanced JSON extraction
 def extract_json(text):
     """Extract JSON from text with fallback methods"""
