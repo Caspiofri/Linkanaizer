@@ -1,0 +1,49 @@
+# ── Secrets (NEVER commit these) ──
+Backend/serviceAccountKey.json
+Backend/.env
+Android/linkanaizer-release.ks
+.env
+
+# ── Python ──
+Backend/env/
+Backend/__pycache__/
+Backend/app/__pycache__/
+Backend/app/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# ── Android build outputs ──
+Android/build/
+Android/app/build/
+Android/.gradle/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# ── Gradle ──
+.gradle/
+local.properties
+
+# ── IDE ──
+.idea/
+*.iml
+.vscode/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Temp ──
+.tmp/
+*.tgz
+nul
+
+# ── Binaries ──
+*.exe
+
+# ── Excluded from repo ──
+Frontend/
