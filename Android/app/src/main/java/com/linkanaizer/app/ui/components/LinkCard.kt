@@ -38,6 +38,7 @@ fun LinkCard(
     thumbnailUrl: String?,
     tags: List<String>? = null,
     isRead: Boolean = false,
+    needsReview: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -95,6 +96,19 @@ fun LinkCard(
                         }
                     }
                 }
+                if (needsReview) {
+                    Surface(
+                        shape = RoundedCornerShape(4.dp),
+                        color = Color(0xFFFFA000).copy(alpha = 0.15f),
+                    ) {
+                        Text(
+                            text = "needs review",
+                            fontSize = 10.sp,
+                            color = Color(0xFFFFA000),
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        )
+                    }
+                }
             }
             if (!thumbnailUrl.isNullOrBlank()) {
                 Spacer(Modifier.width(10.dp))
@@ -125,6 +139,7 @@ fun SwipeableLinkCard(
     tags: List<String>? = null,
     isFavorite: Boolean = false,
     isRead: Boolean = false,
+    needsReview: Boolean = false,
     onDelete: () -> Unit,
     onLongClick: (() -> Unit)? = null,
     onFavoriteToggle: (() -> Unit)? = null,
@@ -223,6 +238,19 @@ fun SwipeableLinkCard(
                                     )
                                 }
                             }
+                        }
+                    }
+                    if (needsReview) {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = Color(0xFFFFA000).copy(alpha = 0.15f),
+                        ) {
+                            Text(
+                                text = "needs review",
+                                fontSize = 10.sp,
+                                color = Color(0xFFFFA000),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            )
                         }
                     }
                 }

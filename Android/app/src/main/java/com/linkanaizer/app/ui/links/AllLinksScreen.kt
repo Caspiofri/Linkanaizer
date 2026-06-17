@@ -36,6 +36,8 @@ fun AllLinksScreen(
         TopBar(title = "All My Links", onBackClick = onBackClick)
 
         var searchQuery by remember { mutableStateOf("") }
+        var showNeedsReviewOnly by remember { mutableStateOf(false) }
+
         Box(
             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
             contentAlignment = Alignment.Center,
@@ -44,6 +46,17 @@ fun AllLinksScreen(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
                 onClear = { searchQuery = "" },
+            )
+        }
+
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            FilterChip(
+                selected = showNeedsReviewOnly,
+                onClick = { showNeedsReviewOnly = !showNeedsReviewOnly },
+                label = { Text("Needs Review") },
             )
         }
 
@@ -61,11 +74,16 @@ fun AllLinksScreen(
                 LoadingAnimation()
             }
         } else {
-            val baseLinks = if (searchQuery.isBlank()) state.links else state.links.filter {
-                it.name.contains(searchQuery, ignoreCase = true) ||
-                it.summary.contains(searchQuery, ignoreCase = true) ||
-                it.url.contains(searchQuery, ignoreCase = true)
-            }
+            val baseLinks = state.links
+                .let { links ->
+                    if (searchQuery.isBlank()) links
+                    else links.filter {
+                        it.name.contains(searchQuery, ignoreCase = true) ||
+                        it.summary.contains(searchQuery, ignoreCase = true) ||
+                        it.url.contains(searchQuery, ignoreCase = true)
+                    }
+                }
+                .let { links -> if (showNeedsReviewOnly) links.filter { it.needsReview } else links }
 
             // Favorites float to the top
             val sortedLinks = baseLinks.sortedWith(compareByDescending { it.isFavorite })
@@ -89,6 +107,7 @@ fun AllLinksScreen(
                             tags = link.tags,
                             isFavorite = link.isFavorite,
                             isRead = link.isRead,
+                            needsReview = link.needsReview,
                             onDelete = { viewModel.requestDeleteLink(link.url) },
                             onLongClick = { viewModel.requestEditLink(link.url) },
                             onFavoriteToggle = { viewModel.toggleFavorite(link.url) },

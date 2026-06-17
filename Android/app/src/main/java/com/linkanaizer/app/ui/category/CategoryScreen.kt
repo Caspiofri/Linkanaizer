@@ -146,6 +146,7 @@ fun CategoryScreen(
                         tags = link.tags,
                         isFavorite = link.isFavorite,
                         isRead = link.isRead,
+                        needsReview = link.needsReview,
                         onDelete = { viewModel.requestDeleteLink(link.url) },
                         onLongClick = { viewModel.requestEditLink(link.url) },
                         onFavoriteToggle = { viewModel.toggleFavorite(link.url) },

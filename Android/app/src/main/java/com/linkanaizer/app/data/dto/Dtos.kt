@@ -70,6 +70,7 @@ data class LinkDto(
     val timestamp: String? = null,
     @SerializedName("is_favorite") val isFavorite: Boolean = false,
     @SerializedName("is_read") val isRead: Boolean = false,
+    @SerializedName("needs_review") val needsReview: Boolean = false,
 )
 
 data class InsertCategoryResponse(
