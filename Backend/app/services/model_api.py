@@ -28,10 +28,10 @@ def _post_with_retry(url, headers, json_data, timeout=15, max_retries=5, initial
         last_response = response
         if attempt < max_retries:
             delay = initial_delay * (2 ** attempt)  # 5s, 10s, 20s, 40s, 80s
-            print(f"⏳ Rate limited (429). Retry {attempt + 1}/{max_retries} in {delay}s...")
+            print(f"Rate limited (429). Retry {attempt + 1}/{max_retries} in {delay}s...")
             time.sleep(delay)
         else:
-            print(f"❌ Rate limited (429). All {max_retries} retries exhausted.")
+            print(f"Rate limited (429). All {max_retries} retries exhausted.")
     return last_response
 
 
@@ -70,13 +70,13 @@ def suggest_emoji_openrouter(category: str) -> str:
             if len(raw) <= 4:
                 print(f"emoji raw: {raw}")
                 return raw
-            print(f"⚠️ LLM returned non-emoji text: {raw}")
+            print(f"LLM returned non-emoji text: {raw}")
             return _fallback_emoji(category)
         else:
-            print(f"❌ Emoji API error ({response.status_code}): {response.text}")
+            print(f"Emoji API error ({response.status_code}): {response.text}")
             return _fallback_emoji(category)
     except Exception as e:
-        print(f"❌ Emoji API exception: {e}")
+        print(f"Emoji API exception: {e}")
         return _fallback_emoji(category)
 
 
@@ -144,7 +144,7 @@ def query_llama_summary(url_metadata_desc, categories, existing_tags=None):
         Reuse existing tags when they fit. Only create new tags if none of the existing ones are relevant.
         Return 0 tags if the content is too generic to tag meaningfully. Maximum 2 tags.{tags_section}
 """
-    print("✅ prompt is:", prompt)
+    print("prompt:", prompt)
 
     try:
         response = _post_with_retry(

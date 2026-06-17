@@ -1,5 +1,6 @@
 import asyncio
 import time
+from urllib.parse import urlparse
 from app.core.firebase_config import DB
 from app.services.model_api import query_llama_summary, judge_classification, suggest_emoji_openrouter, _fallback_emoji
 from app.services.eval_service import log_llm_call
@@ -11,11 +12,13 @@ from datetime import datetime
 
 async def process_and_store_url(uid: str, url: str, dt=None, category_hint: str = None):
     if url_exists(uid, url):
-        raise HTTPException(status_code=409, detail="URL already exists in the database")
+        raise HTTPException(status_code=409, detail="This link is already in your library.")
 
     result = await asyncio.to_thread(process_url, url, uid, dt, category_hint)
-    if not result:
-        raise HTTPException(status_code=400, detail="Failed to process the URL")
+    if not result or not result.get("success"):
+        message = (result or {}).get("message", "Failed to process the URL.")
+        status_code = (result or {}).get("status_code", 400)
+        raise HTTPException(status_code=status_code, detail=message)
 
     return result
 
@@ -60,8 +63,12 @@ def get_links_by_category(uid: str, category_name: str):
 def process_url(url: str, uid: str, dt=None, category_hint: str = None):
     url_metadata = extract_url(url)
     if not url_metadata.get("description"):
-        print("❌ Failed to extract URL metadata or no content.")
-        return False
+        print("Failed to extract URL metadata or no content.")
+        return {
+            "success": False,
+            "status_code": 422,
+            "message": "Could not extract content from this URL. The page may require a login or block scrapers.",
+        }
 
     raw_text = url_metadata["description"]
     if url_metadata.get("title"):
@@ -70,12 +77,13 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
     cleaned_text = processing_content(raw_text)
 
     judge = {"verdict": "UNKNOWN", "reasoning": "", "latency_ms": 0}
+    llm_fallback = False
+
+    category_name_to_id = get_all_categories_with_ids(uid)
+    categories = list(category_name_to_id.keys())
+    existing_tags = get_all_tags(uid)
 
     try:
-        category_name_to_id = get_all_categories_with_ids(uid)
-        categories = list(category_name_to_id.keys())
-        existing_tags = get_all_tags(uid)
-
         t0 = time.time()
         llm_result = query_llama_summary(cleaned_text, categories, existing_tags)
         classify_latency_ms = int((time.time() - t0) * 1000)
@@ -104,31 +112,35 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
         summary = llm_result["summary"]
         tags = llm_result.get("tags", [])
 
-        # If the user picked a category manually, honour it; otherwise use the AI suggestion
         if category_hint:
             category = category_hint.strip().lower()
-            print(f"📌 Using user-provided category hint: '{category}'")
+            print(f"Using user-provided category hint: '{category}'")
         else:
             category = llm_result["category"].strip().lower()
 
-        # Try exact match first, then fuzzy match for slight differences
         category_id = category_name_to_id.get(category)
         if category_id is None:
             for existing_cat, cat_id in category_name_to_id.items():
                 if existing_cat.replace(" ", "") == category.replace(" ", ""):
                     category_id = cat_id
-                    category = existing_cat  # use the stored name
-                    print(f"🔄 Fuzzy-matched category '{category}'")
+                    category = existing_cat
+                    print(f"Fuzzy-matched category '{category}'")
                     break
 
     except Exception as e:
-        print("❌ LLM summarization failed:", e)
-        return False
+        print(f"LLM failed, saving with fallback data: {e}")
+        domain = urlparse(url).netloc.replace("www.", "") or "Saved Link"
+        name = domain
+        summary = "Summary unavailable — link saved for manual review."
+        tags = []
+        category = category_hint.strip().lower() if category_hint else "uncategorized"
+        category_id = category_name_to_id.get(category)
+        llm_fallback = True
 
     try:
         # Auto-create category if it doesn't exist
         if category_id is None:
-            print(f"📂 Category '{category}' not found — creating it automatically")
+            print(f"Category '{category}' not found — creating it automatically")
             # Try local fallback first to avoid back-to-back API calls
             emoji = _fallback_emoji(category)
             if emoji == "📌":
@@ -143,7 +155,7 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
                 'timestamp': datetime.now()
             })
             category_id = new_cat_ref.id
-            print(f"✅ Auto-created category '{category}' with id {category_id}")
+            print(f"Auto-created category '{category}' with id {category_id}")
 
         doc_ref = DB.collection('users').document(uid).collection('urls').document()
         doc_ref.set({
@@ -155,33 +167,28 @@ def process_url(url: str, uid: str, dt=None, category_hint: str = None):
             'thumbnail': url_metadata["thumbnail"],
             'tags': tags,
             'timestamp': dt if dt else datetime.now(),
-            'needs_review': judge["verdict"] == "NO",
+            'needs_review': llm_fallback or judge["verdict"] == "NO",
             'judge_verdict': judge["verdict"],
             'judge_reasoning': judge["reasoning"],
         })
         url_id = doc_ref.id
-        print("✅ URL saved to Firestore.")
+        print("URL saved to Firestore.")
 
-        if(update_category_count(uid, category)):
-            print(f"category count is updated! ")
-        else:
-            print(f"category count failed to be updated ")
+        update_category_count(uid, category)
+        update_mapping(uid, url_id, category_id)
 
-        if(update_mapping(uid,url_id, category_id)):
-            print(f"mapping is updated! ")
-        else:
-            print(f"mapping failed to be updated ")
-
-
-        return {
-            "success": True,
-            "name": name,
-            "category": category,
-        }
+        result = {"success": True, "name": name, "category": category}
+        if llm_fallback:
+            result["warning"] = "AI summary unavailable. Link saved for manual review."
+        return result
 
     except Exception as e:
-        print("❌ Failed to save to Firestore:", e)
-        return False
+        print(f"Failed to save to Firestore: {e}")
+        return {
+            "success": False,
+            "status_code": 500,
+            "message": "Failed to save your link. Please try again.",
+        }
 
 
 def delete_link(uid: str, url: str):
