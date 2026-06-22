@@ -8,11 +8,17 @@ No manual filing. Linkanaizer fetches the page, extracts its content, sends it t
 
 ## Demo
 
-| Home | Insert Link | Categories |
-|------|-------------|------------|
-| ![home](docs/screenshots/home.png) | ![insert](docs/screenshots/insert.png) | ![categories](docs/screenshots/categories.png) |
+| Login | Home | Insert Link |
+|-------|------|-------------|
+| ![login](readme_screenshots/login.jpeg) | ![home](readme_screenshots/home.jpeg) | ![insert](readme_screenshots/insert_link.jpeg) |
 
-> Screenshots coming soon — run locally with the setup steps below.
+| Category View | All Categories | Import File |
+|---------------|----------------|-------------|
+| ![category](readme_screenshots/category_view.jpeg) | ![categories](readme_screenshots/all_categories.jpeg) | ![import](readme_screenshots/import_file.jpeg) |
+
+| Share — Pick Category | Share — Saving | Share — Saved |
+|-----------------------|----------------|---------------|
+| ![pick](readme_screenshots/sharing_category_pick.jpeg) | ![saving](readme_screenshots/sharing_saving.jpeg) | ![saved](readme_screenshots/sharing_saved.jpeg) |
 
 ---
 
@@ -105,6 +111,46 @@ flowchart TD
 
 ---
 
+## Eval & Observability
+
+Every URL that goes through the LLM pipeline produces two Firestore log entries under `users/{uid}/llm_logs`, giving full observability into model quality and latency.
+
+### Two-call pipeline
+
+```
+Scrape → Clean text → [1] Classify (Gemma 3) → [2] Judge (Gemma 3) → Store
+```
+
+| Call | Function | Purpose |
+|------|----------|---------|
+| **Classify** | `query_llama_summary` in `model_api.py` | Generates `summary`, `category`, `short_name`, `tags` |
+| **Judge** | `judge_classification` in `model_api.py` | Second LLM call that verifies the classification is accurate |
+
+### Judge call
+
+`judge_classification(url_metadata_text, llm_result)` sends the scraped content alongside the first call's output back to Gemma 3 as a quality-checker prompt. It returns:
+
+```json
+{ "verdict": "YES" | "NO", "reasoning": "<one sentence>", "latency_ms": 342 }
+```
+
+A `verdict: "NO"` means the model flagged its own classification as inaccurate — useful for spotting categories that need prompt tuning.
+
+### Firestore log schema
+
+Both calls are persisted by `log_llm_call` in `eval_service.py` (`users/{uid}/llm_logs`):
+
+| Field | Classify entry | Judge entry |
+|-------|---------------|-------------|
+| `type` | `"classify"` | `"judge"` |
+| `model` | `"google/gemma-3-4b-it"` | `"google/gemma-3-4b-it"` |
+| `url` | saved URL | saved URL |
+| `latency_ms` | LLM call duration | Judge call duration |
+| `category` / `tags` / `summary` | LLM output | — |
+| `verdict` / `reasoning` | — | Judge output |
+
+---
+
 ## Features
 
 - **AI categorization** — LLM reads the page and assigns it to one of your categories, or creates a new one automatically
@@ -173,7 +219,8 @@ linkanaizer/
         ├── services/
         │   ├── url_service.py            # Core URL pipeline + link CRUD
         │   ├── extract_service.py        # HTML scraper (SSRF-safe)
-        │   ├── model_api.py              # OpenRouter / Gemma 3 + retry logic
+        │   ├── model_api.py              # OpenRouter / Gemma 3 + retry logic + judge_classification
+        │   ├── eval_service.py           # log_llm_call — persists LLM traces to Firestore
         │   └── category_service.py
         ├── core/firebase_config.py       # Firebase Admin SDK init
         └── utils/token_verifier.py       # JWT middleware
