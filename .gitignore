@@ -2,6 +2,7 @@
 Backend/serviceAccountKey.json
 Backend/.env
 Android/linkanaizer-release.ks
+Android/app/google-services.json
 .env
 
 # ── Python ──
