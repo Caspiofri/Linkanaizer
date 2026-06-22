@@ -10,15 +10,15 @@ No manual filing. Linkanaizer fetches the page, extracts its content, sends it t
 
 | Login | Home | Insert Link |
 |-------|------|-------------|
-| ![login](readme_screenshots/login.jpeg) | ![home](readme_screenshots/home.jpeg) | ![insert](readme_screenshots/insert_link.jpeg) |
+| ![login](docs/screenshots/login.jpeg) | ![home](docs/screenshots/home.jpeg) | ![insert](docs/screenshots/insert_link.jpeg) |
 
 | Category View | All Categories | Import File |
 |---------------|----------------|-------------|
-| ![category](readme_screenshots/category_view.jpeg) | ![categories](readme_screenshots/all_categories.jpeg) | ![import](readme_screenshots/import_file.jpeg) |
+| ![category](docs/screenshots/category_view.jpeg) | ![categories](docs/screenshots/all_categories.jpeg) | ![import](docs/screenshots/import_file.jpeg) |
 
 | Share — Pick Category | Share — Saving | Share — Saved |
 |-----------------------|----------------|---------------|
-| ![pick](readme_screenshots/sharing_category_pick.jpeg) | ![saving](readme_screenshots/sharing_saving.jpeg) | ![saved](readme_screenshots/sharing_saved.jpeg) |
+| ![pick](docs/screenshots/sharing_category_pick.jpeg) | ![saving](docs/screenshots/sharing_saving.jpeg) | ![saved](docs/screenshots/sharing_saved.jpeg) |
 
 ---
 
