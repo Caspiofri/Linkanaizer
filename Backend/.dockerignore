@@ -7,3 +7,4 @@ __pycache__/
 .gitignore
 serviceAccountKey.json
 test_*.py
+tests/
