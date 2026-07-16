@@ -5,3 +5,5 @@ __pycache__/
 .env
 .git/
 .gitignore
+serviceAccountKey.json
+test_*.py
